@@ -1,0 +1,298 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: #eef2f6;
+  color: #1e293b;
+  overflow: hidden;
+  user-select: none;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+.no-pointer-events {
+  pointer-events: none;
+}
+
+/* 3D Labels */
+.roof-label {
+  background: white;
+  color: black;
+  border: 1px solid black;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.badge-label {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid #ccc;
+  white-space: nowrap;
+}
+
+/* 3D Labels */
+.roof-label {
+  background: white;
+  color: black;
+  border: 1px solid black;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+}
+
+/* 3D Environment Info Card */
+.env-info-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 10px 16px 10px 10px;
+  border-radius: 40px;
+  border: 2px solid #94a3b8;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  width: 350px; /* Fixed width to prevent squishing */
+  pointer-events: none;
+}
+.circle-num-large {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #ffffff;
+  border: 2px solid #1e293b;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+.env-info-text {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #334155;
+  text-align: left;
+}
+.env-info-text strong {
+  display: block;
+  font-size: 1rem;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.red-badge {
+  background: rgba(254, 226, 226, 0.9);
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+/* Atmosphere 3D Labels */
+.atmos-3d-label {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1e293b;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 6px 16px;
+  border-radius: 8px;
+  border-left: 4px solid #3b82f6;
+  white-space: nowrap;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  pointer-events: none;
+}
+
+/* UI Layer (2D Overlay) */
+.ui-layer {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Sidebar */
+.sidebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 320px;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  border-right: 1px solid rgba(148, 163, 184, 0.5);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  pointer-events: auto;
+  box-shadow: 4px 0 24px rgba(0,0,0,0.05);
+  overflow-y: auto;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sidebar.closed {
+  transform: translateX(-100%);
+}
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  border-bottom: 2px solid #cbd5e1;
+  padding-bottom: 12px;
+}
+
+.sidebar-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #64748b;
+  transition: color 0.2s;
+  padding: 0 4px;
+}
+.close-btn:hover {
+  color: #ef4444;
+}
+
+.open-sidebar-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  border: 2px solid #94a3b8;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.2s;
+}
+.open-sidebar-btn:hover {
+  transform: translateY(-2px);
+}
+
+.card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s, border-color 0.2s;
+}
+.card:hover {
+  transform: translateY(-2px);
+}
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.circle-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid black;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+.card h4 {
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+}
+.card p {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #475569;
+}
+
+/* Mini Graphics inside Cards */
+.mini-roof {
+  width: 60px; height: 30px;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  margin-top: 4px;
+}
+.white-roof {
+  background: #e2e8f0;
+  border-bottom: 4px solid #f8fafc;
+}
+.red-roof {
+  background: #ef4444;
+  position: relative;
+}
+.mini-arrows {
+  width: 60px; height: 30px;
+  border-left: 4px solid #fde047;
+  border-bottom: 4px solid #fde047;
+  transform: rotate(-45deg) scale(0.6);
+  margin-left: 10px;
+}
+
+/* Atmosphere Toggle Button */
+.toggle-atmos-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  border: 2px solid #94a3b8;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  pointer-events: auto;
+  transition: transform 0.2s, background 0.2s;
+}
+.toggle-atmos-btn:hover {
+  transform: translateY(-2px);
+  background: white;
+}
