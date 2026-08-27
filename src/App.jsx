@@ -37,12 +37,12 @@ const Arrow = ({ position, rotation, color, scale = 1 }) => (
 // 3D COMPONENTS
 // --------------------------------------------------------
 const House = ({ roofType, setRoofType, activePopup, setActivePopup }) => {
-  const isBio = roofType === 'biochitin';
+  const isCoolingRoof = roofType === 'coolingRoof';
   const isNormal = roofType === 'normal';
 
   const handleRoofGeometryClick = (e) => {
     e.stopPropagation();
-    setRoofType(isBio ? 'normal' : 'biochitin');
+    setRoofType(isCoolingRoof ? 'normal' : 'coolingRoof');
     setActivePopup(null);
   };
 
@@ -52,7 +52,7 @@ const House = ({ roofType, setRoofType, activePopup, setActivePopup }) => {
       setRoofType('initial');
       setActivePopup(null);
     } else {
-      setRoofType('biochitin');
+      setRoofType('coolingRoof');
       setActivePopup('roof1');
     }
   };
@@ -74,7 +74,7 @@ const House = ({ roofType, setRoofType, activePopup, setActivePopup }) => {
       setRoofType('initial');
       setActivePopup(null);
     } else {
-      setRoofType('biochitin');
+      setRoofType('coolingRoof');
       setActivePopup('reflect');
     }
   };
@@ -154,21 +154,21 @@ const House = ({ roofType, setRoofType, activePopup, setActivePopup }) => {
         <mesh castShadow receiveShadow>
           <extrudeGeometry args={[roofShape, extrudeSettings]} />
           <meshStandardMaterial 
-            color={roofType === 'initial' ? '#8B4513' : (isBio ? '#ffffff' : '#b91c1c')} 
-            roughness={isBio ? 0.2 : 0.8}
+            color={roofType === 'initial' ? '#8B4513' : (isCoolingRoof ? '#ffffff' : '#b91c1c')} 
+            roughness={isCoolingRoof ? 0.2 : 0.8}
             metalness={0.1}
           />
         </mesh>
         
-        {/* Label 1: Biochitin */}
+        {/* Label 1: Cooling Roof */}
         <Html position={[-1.5, 1.5, 2.5]} center className="no-pointer-events">
           <div style={{ position: 'relative' }}>
             <div className="roof-label" onClick={handleLabel1Click} style={{ 
               cursor: 'pointer', 
               pointerEvents: 'auto',
-              background: isBio ? '#1e293b' : 'white',
-              color: isBio ? 'white' : 'black',
-              borderColor: isBio ? '#1e293b' : 'black'
+              background: isCoolingRoof ? '#1e293b' : 'white',
+              color: isCoolingRoof ? 'white' : 'black',
+              borderColor: isCoolingRoof ? '#1e293b' : 'black'
             }}>
               1
             </div>
@@ -177,8 +177,8 @@ const House = ({ roofType, setRoofType, activePopup, setActivePopup }) => {
               <div className="env-info-card" style={{ position: 'absolute', right: '40px', top: '-30px' }}>
                 <div className="circle-num-large">1</div>
                 <div className="env-info-text">
-                  <strong>Biochitin Cooling Roof</strong>
-                  <p>Menggunakan bahan organik bumi berbeda dari PDRC umum, untuk mendinginkan rumah dengan efisiensi tinggi.</p>
+                  <strong>Cooling Roof</strong>
+                  <p>Solusi atap pendingin yang memantulkan panas dan mendinginkan rumah dengan efisiensi tinggi.</p>
                 </div>
               </div>
             )}
@@ -211,7 +211,7 @@ const House = ({ roofType, setRoofType, activePopup, setActivePopup }) => {
         </Html>
       </group>
 
-      {isBio && (
+      {isCoolingRoof && (
         <Float speed={2} rotationIntensity={0} floatIntensity={0.5}>
           <group position={[0, 4.5, 0]}>
             <group rotation={[0, 0, -Math.PI / 6]}>
@@ -547,7 +547,7 @@ export default function App() {
   };
 
   const toggleRoof = () => {
-    setRoofType(prev => prev === 'biochitin' ? 'normal' : 'biochitin');
+    setRoofType(prev => prev === 'coolingRoof' ? 'normal' : 'coolingRoof');
   };
 
   return (
@@ -603,20 +603,20 @@ export default function App() {
           
           <div 
             className="card" 
-            onClick={() => handleCardClick('biochitin', 'roof1')} 
+            onClick={() => handleCardClick('coolingRoof', 'roof1')} 
             style={{cursor: 'pointer', borderColor: activePopup === 'roof1' ? '#3b82f6' : '#cbd5e1'}}
           >
             <div className="card-top">
               <span className="circle-num">1</span>
               <div className="mini-roof white-roof"></div>
             </div>
-            <h4>1. Biochitin Cooling Roof</h4>
-            <p>Menggunakan bahan organik bumi, berbeda dari PDRC umum, untuk mendinginkan rumah dengan efisiensi tinggi.</p>
+            <h4>1. Cooling Roof</h4>
+            <p>Solusi atap pendingin yang memantulkan panas dan mendinginkan rumah dengan efisiensi tinggi.</p>
           </div>
 
           <div 
             className="card" 
-            onClick={() => handleCardClick('biochitin', 'reflect')} 
+            onClick={() => handleCardClick('coolingRoof', 'reflect')} 
             style={{cursor: 'pointer', borderColor: activePopup === 'reflect' ? '#3b82f6' : '#cbd5e1'}}
           >
             <div className="card-top">
