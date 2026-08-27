@@ -296,3 +296,77 @@ body {
   transform: translateY(-2px);
   background: white;
 }
+
+/* ==================================================
+   MOBILE RESPONSIVENESS
+================================================== */
+@media (max-width: 768px) {
+  /* Convert Sidebar to a Bottom Sheet */
+  .sidebar {
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    height: 60vh;
+    border-right: none;
+    border-top: 1px solid rgba(148, 163, 184, 0.5);
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.1);
+    padding: 20px;
+    z-index: 1000;
+  }
+  
+  .sidebar.closed {
+    transform: translateY(100%);
+  }
+  
+  .sidebar.open {
+    transform: translateY(0);
+  }
+
+  /* Move open button to bottom center */
+  .open-sidebar-btn {
+    top: auto;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    border-radius: 24px;
+    z-index: 999;
+  }
+  .open-sidebar-btn:hover {
+    transform: translate(-50%, -2px);
+  }
+
+  /* Adjust top buttons */
+  .toggle-atmos-btn {
+    top: 12px;
+    right: 12px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  /* Adjust 3D Popups */
+  .env-info-card {
+    width: 220px;
+    padding: 10px;
+  }
+  .env-info-card h4 {
+    font-size: 0.9rem;
+  }
+  .env-info-card p {
+    font-size: 0.8rem;
+  }
+
+  /* Shrink 3D Labels */
+  .roof-label {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+  
+  /* Shrink Atmosphere 3D Labels */
+  .atmos-3d-label {
+    font-size: 1rem;
+    padding: 4px 10px;
+  }
+}
