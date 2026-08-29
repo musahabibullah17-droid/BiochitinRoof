@@ -298,6 +298,113 @@ body {
 }
 
 /* ==================================================
+   EXPLODED ROOF VIEW
+================================================== */
+
+/* Layer Labels (3D overlay labels for each roof layer) */
+.layer-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 2px solid rgba(148, 163, 184, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: fadeSlideIn 0.5s ease-out forwards;
+}
+.layer-label strong {
+  display: block;
+  font-size: 0.9rem;
+  color: #0f172a;
+  margin-bottom: 2px;
+}
+.layer-label span {
+  font-size: 0.78rem;
+  color: #64748b;
+  display: block;
+}
+
+.kitosan-label {
+  border-left: 4px solid #14b8a6;
+}
+.baso4-label {
+  border-left: 4px solid #f59e0b;
+}
+
+.layer-color-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Exploded View Info Card */
+.exploded-info-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(241,245,249,0.96));
+  backdrop-filter: blur(12px);
+  padding: 14px 18px;
+  border-radius: 16px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    inset 0 0 0 2px rgba(20, 184, 166, 0.25);
+  width: 320px;
+  pointer-events: none;
+  animation: fadeSlideIn 0.6s ease-out forwards;
+}
+.exploded-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.exploded-info-text {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #334155;
+}
+.exploded-info-text strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+.exploded-info-text em {
+  color: #14b8a6;
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* Pulse animation for active roof label */
+.roof-label-pulse {
+  animation: labelPulse 2s ease-in-out infinite;
+}
+
+@keyframes labelPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(30, 41, 59, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(30, 41, 59, 0); }
+}
+
+@keyframes fadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ==================================================
    MOBILE RESPONSIVENESS
 ================================================== */
 @media (max-width: 768px) {
@@ -368,5 +475,27 @@ body {
   .atmos-3d-label {
     font-size: 1rem;
     padding: 4px 10px;
+  }
+
+  /* Exploded View Mobile */
+  .layer-label {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  .layer-label strong {
+    font-size: 0.8rem;
+  }
+  .layer-label span {
+    font-size: 0.7rem;
+  }
+  .exploded-info-card {
+    width: 240px;
+    padding: 10px 14px;
+  }
+  .exploded-info-text {
+    font-size: 0.75rem;
+  }
+  .exploded-info-text strong {
+    font-size: 0.85rem;
   }
 }
