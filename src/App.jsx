@@ -20,18 +20,193 @@ gableShape.lineTo(-2.1, 0);
 
 const extrudeSettings = { depth: 5, bevelEnabled: false };
 
-const Arrow = ({ position, rotation, color, scale = 1 }) => (
+const Arrow = ({ position, rotation, color, scale = 1, emissiveIntensity = 0.5 }) => (
   <group position={position} rotation={rotation} scale={scale}>
     <mesh position={[0, 0.5, 0]}>
       <cylinderGeometry args={[0.08, 0.08, 1, 8]} />
-      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
+      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={emissiveIntensity} />
     </mesh>
     <mesh position={[0, 1.1, 0]}>
       <coneGeometry args={[0.25, 0.4, 8]} />
-      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} />
+      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={emissiveIntensity} />
     </mesh>
   </group>
 );
+
+// --------------------------------------------------------
+// ANIMATED BOUNCING ARROW STREAM
+// --------------------------------------------------------
+const BouncingRayStream = ({
+  count = 7,
+  speed = 10,
+  spacing = 4.5,
+  color = '#fde047',
+  scale = 2.2,
+  angle = 0,
+  isHighActive = false,
+  originY = 0,
+}) => {
+  const groupRef = useRef();
+
+  useFrame((state) => {
+    if (!groupRef.current) return;
+    const time = state.clock.elapsedTime;
+    const activeSpeed = isHighActive ? speed * 1.6 : speed;
+    const totalLength = count * spacing;
+
+    groupRef.current.children.forEach((child, i) => {
+      // Travel outwards along ray direction
+      const currentPos = (i * spacing + time * activeSpeed) % totalLength;
+      child.position.y = originY + currentPos;
+
+      // Dynamic bounce / wave oscillation
+      const bounce = Math.sin(time * 7 + i * 0.8) * (isHighActive ? 0.3 : 0.15);
+      child.position.x = bounce;
+
+      // Scale pulse on reflection bounce point & smooth fade-in/out
+      const progress = currentPos / totalLength;
+      const entryScale = progress < 0.12 ? (progress / 0.12) : 1;
+      const exitScale = progress > 0.85 ? ((1 - progress) / 0.15) : 1;
+      const pulse = isHighActive ? (Math.sin(time * 9 + i * 1.2) * 0.15 + 1.05) : 1;
+      const finalScale = scale * entryScale * exitScale * pulse;
+
+      child.scale.set(finalScale, finalScale, finalScale);
+    });
+  });
+
+  return (
+    <group rotation={[0, 0, angle]}>
+      <group ref={groupRef}>
+        {[...Array(count)].map((_, i) => (
+          <Arrow
+            key={i}
+            position={[0, originY + i * spacing, 0]}
+            color={color}
+            scale={scale}
+            emissiveIntensity={isHighActive ? 0.8 : 0.5}
+          />
+        ))}
+      </group>
+    </group>
+  );
+};
+
+const IncomingSunRayStream = ({
+  count = 9,
+  speed = 8,
+  spacing = 6.2,
+  color = '#fcd34d',
+  scale = 2.5,
+  isHighActive = false,
+}) => {
+  const groupRef = useRef();
+
+  useFrame((state) => {
+    if (!groupRef.current) return;
+    const time = state.clock.elapsedTime;
+    const activeSpeed = isHighActive ? speed * 1.5 : speed;
+    const totalLength = count * spacing;
+
+    groupRef.current.children.forEach((child, i) => {
+      const currentPos = (i * spacing + time * activeSpeed) % totalLength;
+      child.position.y = currentPos;
+
+      const bounce = Math.sin(time * 5 + i * 0.6) * 0.1;
+      child.position.x = bounce;
+    });
+  });
+
+  return (
+    <group ref={groupRef}>
+      {[...Array(count)].map((_, i) => (
+        <Arrow key={i} position={[0, i * spacing, 0]} color={color} scale={scale} />
+      ))}
+    </group>
+  );
+};
+
+// --------------------------------------------------------
+// RAIN SYSTEM (Interactive Weather)
+// --------------------------------------------------------
+const RainSystem = ({ isRaining }) => {
+  const rainCount = 2000;
+  const positions = useMemo(() => {
+    const pos = new Float32Array(rainCount * 6);
+    for (let i = 0; i < rainCount; i++) {
+      const x = (Math.random() - 0.5) * 140;
+      const y = Math.random() * 65;
+      const z = (Math.random() - 0.5) * 140;
+      const dropLen = 0.9 + Math.random() * 0.7;
+
+      pos[i * 6] = x;
+      pos[i * 6 + 1] = y;
+      pos[i * 6 + 2] = z;
+
+      pos[i * 6 + 3] = x;
+      pos[i * 6 + 4] = y - dropLen;
+      pos[i * 6 + 5] = z;
+    }
+    return pos;
+  }, [rainCount]);
+
+  const geoRef = useRef();
+  const speeds = useMemo(() => {
+    const spd = [];
+    for (let i = 0; i < rainCount; i++) {
+      spd.push(40 + Math.random() * 25);
+    }
+    return spd;
+  }, [rainCount]);
+
+  useFrame((state, delta) => {
+    if (!isRaining || !geoRef.current) return;
+    const posAttr = geoRef.current.attributes.position;
+    const arr = posAttr.array;
+
+    for (let i = 0; i < rainCount; i++) {
+      const spd = speeds[i] * delta;
+      arr[i * 6 + 1] -= spd;
+      arr[i * 6 + 4] -= spd;
+
+      if (arr[i * 6 + 4] < -1) {
+        const x = (Math.random() - 0.5) * 140;
+        const y = 55 + Math.random() * 15;
+        const z = (Math.random() - 0.5) * 140;
+        const dropLen = 0.9 + Math.random() * 0.7;
+
+        arr[i * 6] = x;
+        arr[i * 6 + 1] = y;
+        arr[i * 6 + 2] = z;
+
+        arr[i * 6 + 3] = x;
+        arr[i * 6 + 4] = y - dropLen;
+        arr[i * 6 + 5] = z;
+      }
+    }
+    posAttr.needsUpdate = true;
+  });
+
+  if (!isRaining) return null;
+
+  return (
+    <lineSegments>
+      <bufferGeometry ref={geoRef}>
+        <bufferAttribute
+          attach="attributes-position"
+          count={rainCount * 2}
+          array={positions}
+          itemSize={3}
+        />
+      </bufferGeometry>
+      <lineBasicMaterial
+        color="#7dd3fc"
+        transparent
+        opacity={0.75}
+        depthWrite={false}
+      />
+    </lineSegments>
+  );
+};
 
 // --------------------------------------------------------
 // EXPLODED ROOF LAYERS (Cooling Roof Detail)
@@ -70,7 +245,6 @@ const ExplodedRoofLayers = ({ visible, onClick }) => {
   useFrame(() => {
     currentOpacity.current += (targetOpacity.current - currentOpacity.current) * 0.08;
     if (groupRef.current) {
-      // Smooth scale-in for the whole group
       const targetScale = visible ? 1 : 0;
       groupRef.current.scale.lerp(
         new THREE.Vector3(targetScale, targetScale, targetScale),
@@ -131,7 +305,7 @@ const ExplodedRoofLayers = ({ visible, onClick }) => {
 
       {/* Connector line between layers */}
       {visible && (
-        <Html position={[-6, 5.5, 0]} center className="no-pointer-events">
+        <Html position={[-3.5, 6.2, 0]} center className="no-pointer-events">
           <div className="exploded-info-card">
             <div className="circle-num-large" style={{ width: '32px', height: '32px', fontSize: '1.1rem', marginRight: '4px' }}>1</div>
             <div className="exploded-info-text">
@@ -163,7 +337,154 @@ const AnimatedRoof = ({ children, isExploded }) => {
 };
 
 // --------------------------------------------------------
-// 3D COMPONENTS
+// NEIGHBOR HOUSE (Side houses on Left & Right)
+// --------------------------------------------------------
+const NeighborHouse = ({
+  position,
+  visible,
+  doorColor = '#3b82f6',
+  roofColor = '#ffffff',
+  isNormal = false,
+  isCoolingRoof = false,
+}) => {
+  const groupRef = useRef();
+
+  useFrame(() => {
+    if (groupRef.current) {
+      const targetScale = visible ? 1 : 0;
+      groupRef.current.scale.lerp(
+        new THREE.Vector3(targetScale, targetScale, targetScale),
+        0.06
+      );
+    }
+  });
+
+  return (
+    <group ref={groupRef} position={position} scale={[0, 0, 0]}>
+      {/* Foundation / Base */}
+      <mesh castShadow receiveShadow position={[0, 0.1, 0]}>
+        <boxGeometry args={[4.6, 0.2, 4.8]} />
+        <meshStandardMaterial color="#64748b" roughness={0.9} />
+      </mesh>
+
+      {/* Main Walls */}
+      <mesh castShadow receiveShadow position={[0, 1.35, 0]}>
+        <boxGeometry args={[4.2, 2.3, 4.4]} />
+        <meshStandardMaterial color="#f8fafc" roughness={0.8} />
+      </mesh>
+
+      {/* Front Gable */}
+      <mesh position={[0, 2.5, 2.2]} receiveShadow castShadow>
+        <extrudeGeometry args={[gableShape, { depth: 0.05, bevelEnabled: false }]} />
+        <meshStandardMaterial color="#f8fafc" roughness={0.8} />
+      </mesh>
+
+      {/* Back Gable */}
+      <mesh position={[0, 2.5, -2.25]} receiveShadow castShadow>
+        <extrudeGeometry args={[gableShape, { depth: 0.05, bevelEnabled: false }]} />
+        <meshStandardMaterial color="#f8fafc" roughness={0.8} />
+      </mesh>
+
+      {/* Door Frame */}
+      <mesh position={[-0.8, 1.15, 2.2]} castShadow receiveShadow>
+        <boxGeometry args={[1.2, 1.9, 0.1]} />
+        <meshStandardMaterial color="#cbd5e1" roughness={0.7} />
+      </mesh>
+
+      {/* Door */}
+      <mesh position={[-0.8, 1.15, 2.24]} castShadow receiveShadow>
+        <boxGeometry args={[1.0, 1.8, 0.05]} />
+        <meshStandardMaterial color={doorColor} roughness={0.6} />
+      </mesh>
+
+      {/* Door Knob */}
+      <mesh position={[-0.45, 1.15, 2.28]} castShadow>
+        <sphereGeometry args={[0.06, 16, 16]} />
+        <meshStandardMaterial color="#f8fafc" metalness={0.9} roughness={0.2} />
+      </mesh>
+
+      {/* Front Window */}
+      <group position={[1.0, 1.4, 2.2]}>
+        <mesh castShadow><boxGeometry args={[1.2, 1.2, 0.1]} /><meshStandardMaterial color="#cbd5e1" /></mesh>
+        <mesh position={[0, 0, 0.03]}><boxGeometry args={[1.0, 1.0, 0.05]} /><meshStandardMaterial color="#38bdf8" roughness={0.1} metalness={0.8} envMapIntensity={2.0} transparent opacity={0.6} /></mesh>
+        <mesh position={[0, 0, 0.05]} castShadow><boxGeometry args={[1.0, 0.05, 0.05]} /><meshStandardMaterial color="#cbd5e1" /></mesh>
+        <mesh position={[0, 0, 0.05]} castShadow><boxGeometry args={[0.05, 1.0, 0.05]} /><meshStandardMaterial color="#cbd5e1" /></mesh>
+      </group>
+
+      {/* Right Window */}
+      <group position={[2.1, 1.4, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <mesh castShadow><boxGeometry args={[2.0, 1.2, 0.1]} /><meshStandardMaterial color="#cbd5e1" /></mesh>
+        <mesh position={[0, 0, 0.03]}><boxGeometry args={[1.8, 1.0, 0.05]} /><meshStandardMaterial color="#38bdf8" roughness={0.1} metalness={0.8} envMapIntensity={2.0} transparent opacity={0.6} /></mesh>
+        <mesh position={[0, 0, 0.05]} castShadow><boxGeometry args={[1.8, 0.05, 0.05]} /><meshStandardMaterial color="#cbd5e1" /></mesh>
+        <mesh position={[-0.45, 0, 0.05]} castShadow><boxGeometry args={[0.05, 1.0, 0.05]} /><meshStandardMaterial color="#cbd5e1" /></mesh>
+        <mesh position={[0.45, 0, 0.05]} castShadow><boxGeometry args={[0.05, 1.0, 0.05]} /><meshStandardMaterial color="#cbd5e1" /></mesh>
+      </group>
+
+      {/* Left Window */}
+      <group position={[-2.1, 1.4, 0]} rotation={[0, -Math.PI / 2, 0]}>
+        <mesh castShadow><boxGeometry args={[2.0, 1.2, 0.1]} /><meshStandardMaterial color="#cbd5e1" /></mesh>
+        <mesh position={[0, 0, 0.03]}><boxGeometry args={[1.8, 1.0, 0.05]} /><meshStandardMaterial color="#38bdf8" roughness={0.1} metalness={0.8} envMapIntensity={2.0} transparent opacity={0.6} /></mesh>
+        <mesh position={[0, 0, 0.05]} castShadow><boxGeometry args={[1.8, 0.05, 0.05]} /><meshStandardMaterial color="#cbd5e1" /></mesh>
+        <mesh position={[-0.45, 0, 0.05]} castShadow><boxGeometry args={[0.05, 1.0, 0.05]} /><meshStandardMaterial color="#cbd5e1" /></mesh>
+        <mesh position={[0.45, 0, 0.05]} castShadow><boxGeometry args={[0.05, 1.0, 0.05]} /><meshStandardMaterial color="#cbd5e1" /></mesh>
+      </group>
+
+      {/* The Roof (White on 1/2, Red on 3) */}
+      <group position={[0, 2.5, -2.5]}>
+        <mesh castShadow receiveShadow>
+          <extrudeGeometry args={[roofShape, extrudeSettings]} />
+          <meshStandardMaterial
+            color={roofColor}
+            roughness={roofColor === '#ffffff' ? 0.2 : 0.8}
+            metalness={0.1}
+          />
+        </mesh>
+      </group>
+
+      {/* Reflection rays when Cooling Roof is active */}
+      {isCoolingRoof && (
+        <group position={[0, 4.5, 0]}>
+          <BouncingRayStream
+            count={5}
+            speed={8}
+            spacing={4.2}
+            color="#fde047"
+            scale={1.8}
+            angle={-Math.PI / 7}
+          />
+          <BouncingRayStream
+            count={5}
+            speed={8.5}
+            spacing={4.5}
+            color="#fde047"
+            scale={1.8}
+            angle={Math.PI / 7}
+          />
+        </group>
+      )}
+
+      {/* Heat absorption & trapped heat arrows when Normal Roof (3) is active */}
+      {isNormal && (
+        <Float speed={3} rotationIntensity={0} floatIntensity={0.2}>
+          <group position={[0, 4.0, 0]}>
+            <group rotation={[0, 0, 0]}>
+              <Arrow position={[0, 1.5, 0]} color="#ef4444" scale={1.6} />
+            </group>
+            <group rotation={[0, 0, -Math.PI / 4]}>
+              <Arrow position={[0, 2.6, 0]} color="#ef4444" scale={1.6} />
+            </group>
+            <group rotation={[0, 0, Math.PI / 4]}>
+              <Arrow position={[0, 2.6, 0]} color="#ef4444" scale={1.6} />
+            </group>
+          </group>
+        </Float>
+      )}
+    </group>
+  );
+};
+
+// --------------------------------------------------------
+// 3D MAIN HOUSE COMPONENT
 // --------------------------------------------------------
 const House = ({ roofType, setRoofType, activePopup, setActivePopup }) => {
   const isCoolingRoof = roofType === 'coolingRoof';
@@ -211,6 +532,24 @@ const House = ({ roofType, setRoofType, activePopup, setActivePopup }) => {
 
   return (
     <group position={[1, -1, 0]}>
+      {/* Neighbor houses on left and right appearing on Cooling Roof (1) and Normal Roof (3) */}
+      <NeighborHouse
+        position={[-6.2, 0, 0]}
+        visible={isCoolingRoof || isNormal}
+        doorColor="#0284c7"
+        roofColor={isNormal ? '#b91c1c' : '#ffffff'}
+        isNormal={isNormal}
+        isCoolingRoof={isCoolingRoof}
+      />
+      <NeighborHouse
+        position={[6.2, 0, 0]}
+        visible={isCoolingRoof || isNormal}
+        doorColor="#10b981"
+        roofColor={isNormal ? '#b91c1c' : '#ffffff'}
+        isNormal={isNormal}
+        isCoolingRoof={isCoolingRoof}
+      />
+
       {/* Foundation / Base */}
       <mesh castShadow receiveShadow position={[0, 0.1, 0]}>
         <boxGeometry args={[4.6, 0.2, 4.8]} />
@@ -336,23 +675,47 @@ const House = ({ roofType, setRoofType, activePopup, setActivePopup }) => {
       {/* Exploded Roof Layers — shown when Cooling Roof is selected */}
       <ExplodedRoofLayers visible={isExploded} onClick={handleRoofGeometryClick} />
 
+      {/* Animated Bouncing Reflection Rays for Cooling Roof */}
       {isCoolingRoof && (
-        <Float speed={2} rotationIntensity={0} floatIntensity={0.5}>
-          <group position={[0, 4.5, 0]}>
-            <group rotation={[0, 0, -Math.PI / 6]}>
-              {[...Array(6)].map((_, i) => (
-                <Arrow key={`a1-${i}`} position={[0, i * 4.5, 0]} color="#fde047" scale={2} />
-              ))}
-            </group>
-            <group rotation={[0, 0, Math.PI / 8]}>
-              {[...Array(7)].map((_, i) => (
-                <Arrow key={`a2-${i}`} position={[0, i * 5, 0]} color="#fde047" scale={2.5} />
-              ))}
-            </group>
-          </group>
-        </Float>
+        <group position={[0, 4.5, 0]}>
+          {/* Ray 1: Solar reflection bouncing left */}
+          <BouncingRayStream
+            count={7}
+            speed={10}
+            spacing={4.2}
+            color="#fde047"
+            scale={2.2}
+            angle={-Math.PI / 5.5}
+            isHighActive={activePopup === 'reflect'}
+          />
+
+          {/* Ray 2: Solar reflection bouncing right */}
+          <BouncingRayStream
+            count={8}
+            speed={10.5}
+            spacing={4.5}
+            color="#fde047"
+            scale={2.4}
+            angle={Math.PI / 7}
+            isHighActive={activePopup === 'reflect'}
+          />
+
+          {/* Ray 3 (Active when number 2 is pressed): Thermal Infrared emission straight up through Atmospheric Window */}
+          {activePopup === 'reflect' && (
+            <BouncingRayStream
+              count={9}
+              speed={12}
+              spacing={4.0}
+              color="#38bdf8"
+              scale={2.0}
+              angle={0}
+              isHighActive={true}
+            />
+          )}
+        </group>
       )}
 
+      {/* Trapped heat dispersion for Normal Roof (3) */}
       {isNormal && (
         <Float speed={3} rotationIntensity={0} floatIntensity={0.2}>
           <group position={[0, 4.0, 0]}>
@@ -408,7 +771,7 @@ const House = ({ roofType, setRoofType, activePopup, setActivePopup }) => {
   );
 };
 
-const SunObject = () => {
+const SunObject = ({ isNormal }) => {
   const sunRef = useRef();
 
   useFrame(() => {
@@ -439,7 +802,6 @@ const SunObject = () => {
 
       {/* Rotating Solar Flares/Rays */}
       <group ref={sunRef}>
-        {/* Primary Rays */}
         {[...Array(12)].map((_, i) => (
           <group key={`ray1-${i}`} rotation={[0, 0, (i * Math.PI) / 6]}>
             <mesh position={[0, 6, 0]}>
@@ -448,7 +810,6 @@ const SunObject = () => {
             </mesh>
           </group>
         ))}
-        {/* Secondary Rays */}
         {[...Array(12)].map((_, i) => (
           <group key={`ray2-${i}`} rotation={[0, 0, (i * Math.PI) / 6 + Math.PI / 12]}>
             <mesh position={[0, 5, 0]}>
@@ -459,17 +820,25 @@ const SunObject = () => {
         ))}
       </group>
 
-      {/* Downward Sun Arrows to House */}
+      {/* Downward Sun Arrows to Center House */}
       <group position={[3, -3, 0]} rotation={[0, 0, -Math.PI * 0.89]}>
-        {[...Array(9)].map((_, i) => (
-          <Arrow
-            key={i}
-            position={[0, i * 6.5, 0]}
-            color="#fcd34d"
-            scale={2.5}
-          />
-        ))}
+        <IncomingSunRayStream count={9} speed={8} spacing={6.5} scale={2.5} />
       </group>
+
+      {/* When Normal Roof (3) is active: Spreading Sun Rays to Left and Right Houses */}
+      {isNormal && (
+        <>
+          {/* Sun Ray Beam to Left House */}
+          <group position={[1.2, -3, 0]} rotation={[0, 0, -Math.PI * 0.835]}>
+            <IncomingSunRayStream count={9} speed={8.2} spacing={6.2} scale={2.2} />
+          </group>
+
+          {/* Sun Ray Beam to Right House */}
+          <group position={[4.8, -3, 0]} rotation={[0, 0, -Math.PI * 0.94]}>
+            <IncomingSunRayStream count={9} speed={8.2} spacing={6.2} scale={2.2} />
+          </group>
+        </>
+      )}
 
       {/* Label */}
       <Html position={[10, -25, 0]} center className="no-pointer-events">
@@ -689,9 +1058,12 @@ const SceneControls = ({ activePopup }) => {
 
   useEffect(() => {
     isAnimating.current = true;
-    if (activePopup === 'roof1' || activePopup === 'roof3') {
-      targetPos.current.set(1, 5, 20);
-      targetLook.current.set(1, 1.5, 0);
+    if (activePopup === 'roof1') {
+      targetPos.current.set(1, 6, 25);
+      targetLook.current.set(1, 1.8, 0);
+    } else if (activePopup === 'roof3') {
+      targetPos.current.set(1, 6, 25);
+      targetLook.current.set(1, 1.8, 0);
     } else if (activePopup === 'reflect') {
       targetPos.current.set(8, 20, 35);
       targetLook.current.set(8, 18, 0);
@@ -735,6 +1107,7 @@ export default function App() {
   const [roofType, setRoofType] = useState('initial');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showAtmosLabels, setShowAtmosLabels] = useState(true);
+  const [isRaining, setIsRaining] = useState(false);
   const [activePopup, setActivePopup] = useState(null);
 
   const handleCardClick = (type, popup) => {
@@ -754,19 +1127,19 @@ export default function App() {
   return (
     <>
       <Canvas shadows camera={{ position: [-25, 20, 50], fov: 45 }}>
-        <color attach="background" args={['#eef2f6']} />
+        <color attach="background" args={[isRaining ? '#94a3b8' : '#eef2f6']} />
 
-        <ambientLight intensity={0.7} />
+        <ambientLight intensity={isRaining ? 0.45 : 0.7} />
         <directionalLight
           position={[-15, 30, 15]}
-          intensity={1.5}
+          intensity={isRaining ? 0.9 : 1.5}
           castShadow
           shadow-mapSize={[2048, 2048]}
         />
-        <Environment preset="city" />
+        <Environment preset={isRaining ? "park" : "city"} />
 
         <AtmosphereLayers showLabels={showAtmosLabels} />
-        <SunObject />
+        <SunObject isNormal={roofType === 'normal'} />
         <NatureEnvironment isCoolingRoof={roofType === 'coolingRoof'} />
         <House
           roofType={roofType}
@@ -776,6 +1149,9 @@ export default function App() {
         />
 
         <AnimatedGround isCoolingRoof={roofType === 'coolingRoof'} />
+
+        {/* Rain Particle Simulation */}
+        <RainSystem isRaining={isRaining} />
 
         <ContactShadows position={[0, -0.95, 0]} opacity={0.5} scale={25} blur={2} far={4} />
 
@@ -848,6 +1224,19 @@ export default function App() {
           onClick={() => setShowAtmosLabels(!showAtmosLabels)}
         >
           {showAtmosLabels ? '👁️ Sembunyikan Label Atmosfer' : '👁️‍🗨️ Tampilkan Label Atmosfer'}
+        </button>
+
+        {/* Toggle Rain Button (Below Eye Button) */}
+        <button
+          className="toggle-rain-btn"
+          onClick={() => setIsRaining(!isRaining)}
+          style={{
+            background: isRaining ? '#0284c7' : 'rgba(255, 255, 255, 0.9)',
+            color: isRaining ? '#ffffff' : '#1e293b',
+            borderColor: isRaining ? '#0284c7' : '#94a3b8',
+          }}
+        >
+          {isRaining ? '🌧️ Hujan: Aktif (Klik untuk Berhenti)' : '🌧️ Turunkan Hujan'}
         </button>
       </div>
     </>
