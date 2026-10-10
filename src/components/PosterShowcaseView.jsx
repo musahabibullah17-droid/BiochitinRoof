@@ -50,7 +50,10 @@ export function PosterShowcaseView({ onSelectRegionForDemo }) {
                 backgroundColor: mobileRegionId === r.id ? r.themeBg : '#ffffff',
                 color: mobileRegionId === r.id ? r.headerTextColor : '#64748b'
               }}
-              onClick={() => setMobileRegionId(r.id)}
+              onClick={() => {
+                setMobileRegionId(r.id);
+                setMobileStepIndex(1);
+              }}
               type="button"
             >
               <MapPin size={13} color={mobileRegionId === r.id ? r.headerPinColor : '#64748b'} />

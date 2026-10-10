@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PhoneDeviceMock } from './PhoneDeviceMock';
 import { ScreenLandForm } from './ScreenLandForm';
 import { ScreenPhotoCondition } from './ScreenPhotoCondition';
@@ -10,6 +10,11 @@ import { RotateCcw, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 export function InteractivePhoneView({ region, onSwitchRegion }) {
   const [currentStep, setCurrentStep] = useState(1);
 
+  // Otomatis kembali ke layar 1 (Analisis Lahan) setiap kali wilayah berganti
+  useEffect(() => {
+    setCurrentStep(1);
+  }, [region.id]);
+
   const stepNames = [
     'Analisis Lahan',
     'Foto Kondisi Lahan',
@@ -17,6 +22,11 @@ export function InteractivePhoneView({ region, onSwitchRegion }) {
     'Rekomendasi Terbaik',
     'Panduan Biopriming'
   ];
+
+  const handleSwitchRegion = (rId) => {
+    setCurrentStep(1);
+    onSwitchRegion(rId);
+  };
 
   return (
     <div className="interactive-phone-wrapper">
@@ -31,7 +41,7 @@ export function InteractivePhoneView({ region, onSwitchRegion }) {
             <button
               key={rId}
               className={`emulator-pill-btn ${region.id === rId ? 'active' : ''}`}
-              onClick={() => onSwitchRegion(rId)}
+              onClick={() => handleSwitchRegion(rId)}
               type="button"
             >
               {rId.toUpperCase()}
