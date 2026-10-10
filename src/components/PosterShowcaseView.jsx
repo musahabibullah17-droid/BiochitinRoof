@@ -113,36 +113,21 @@ export function PosterShowcaseView({ onSelectRegionForDemo }) {
               <div className="poster-row-top">
                 {/* Phone 1: Analisis Lahan */}
                 <div className={`phone-wrapper-cell ${mobileStepIndex === 1 ? 'mobile-step-active' : 'mobile-step-inactive'}`}>
-                  <PhoneDeviceMock
-                    width={224}
-                    height={500}
-                    activeStep={1}
-                    onSelectStep={() => onSelectRegionForDemo && onSelectRegionForDemo(region.id)}
-                  >
+                  <PhoneDeviceMock width={224} height={476}>
                     <ScreenLandForm region={region} onNext={() => onSelectRegionForDemo && onSelectRegionForDemo(region.id)} />
                   </PhoneDeviceMock>
                 </div>
 
                 {/* Phone 2: Foto Kondisi Lahan */}
                 <div className={`phone-wrapper-cell ${mobileStepIndex === 2 ? 'mobile-step-active' : 'mobile-step-inactive'}`}>
-                  <PhoneDeviceMock
-                    width={224}
-                    height={500}
-                    activeStep={2}
-                    onSelectStep={() => onSelectRegionForDemo && onSelectRegionForDemo(region.id)}
-                  >
+                  <PhoneDeviceMock width={224} height={476}>
                     <ScreenPhotoCondition region={region} onNext={() => {}} onPrev={() => {}} />
                   </PhoneDeviceMock>
                 </div>
 
                 {/* Phone 3: Hasil Analisis */}
                 <div className={`phone-wrapper-cell ${mobileStepIndex === 3 ? 'mobile-step-active' : 'mobile-step-inactive'}`}>
-                  <PhoneDeviceMock
-                    width={224}
-                    height={500}
-                    activeStep={3}
-                    onSelectStep={() => onSelectRegionForDemo && onSelectRegionForDemo(region.id)}
-                  >
+                  <PhoneDeviceMock width={224} height={476}>
                     <ScreenAnalysisResult region={region} onNext={() => {}} onPrev={() => {}} />
                   </PhoneDeviceMock>
                 </div>
@@ -152,24 +137,14 @@ export function PosterShowcaseView({ onSelectRegionForDemo }) {
               <div className="poster-row-bottom">
                 {/* Phone 4: Rekomendasi Terbaik */}
                 <div className={`phone-wrapper-cell ${mobileStepIndex === 4 ? 'mobile-step-active' : 'mobile-step-inactive'}`}>
-                  <PhoneDeviceMock
-                    width={224}
-                    height={500}
-                    activeStep={4}
-                    onSelectStep={() => onSelectRegionForDemo && onSelectRegionForDemo(region.id)}
-                  >
+                  <PhoneDeviceMock width={224} height={476}>
                     <ScreenRecommendation region={region} onNext={() => {}} onPrev={() => {}} />
                   </PhoneDeviceMock>
                 </div>
 
                 {/* Phone 5: Panduan Biopriming */}
                 <div className={`phone-wrapper-cell ${mobileStepIndex === 5 ? 'mobile-step-active' : 'mobile-step-inactive'}`}>
-                  <PhoneDeviceMock
-                    width={224}
-                    height={500}
-                    activeStep={5}
-                    onSelectStep={() => onSelectRegionForDemo && onSelectRegionForDemo(region.id)}
-                  >
+                  <PhoneDeviceMock width={224} height={476}>
                     <ScreenBioprimingGuide region={region} onPrev={() => {}} />
                   </PhoneDeviceMock>
                 </div>

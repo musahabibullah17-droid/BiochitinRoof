@@ -1,13 +1,10 @@
 import React from 'react';
 import { Signal, Wifi, BatteryMedium } from 'lucide-react';
-import PhoneBottomNav from './PhoneBottomNav';
 
 export function PhoneDeviceMock({
   children,
-  height = 510,
-  width = 232,
-  activeStep = null,
-  onSelectStep = null
+  height = 476,
+  width = 224
 }) {
   return (
     <div
@@ -32,14 +29,6 @@ export function PhoneDeviceMock({
       <div className="phone-screen-viewport">
         {children}
       </div>
-
-      {/* In-App Native Bottom Navigation Bar */}
-      {activeStep && (
-        <PhoneBottomNav
-          activeStep={activeStep}
-          onSelectStep={onSelectStep || (() => {})}
-        />
-      )}
 
       {/* Hardware Bottom Gesture Home Indicator Bar */}
       <div className="phone-bottom-home-bar"></div>
