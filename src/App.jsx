@@ -2,9 +2,13 @@ import React, { useState } from 'react';
 import { REGIONS_DATA } from './data/regionsData';
 import { PosterShowcaseView } from './components/PosterShowcaseView';
 import { InteractivePhoneView } from './components/InteractivePhoneView';
-import { LayoutGrid, Smartphone, Sparkles, MapPin } from 'lucide-react';
+import { MaintenanceNotice } from './components/MaintenanceNotice';
+import { LayoutGrid, Smartphone, Sparkles } from 'lucide-react';
 
 export default function App() {
+  // Set ke false jika masa perbaikan sudah selesai untuk menampilkan kembali website
+  const isMaintenanceMode = true;
+
   const [viewMode, setViewMode] = useState('poster'); // 'poster' | 'emulator'
   const [activeRegionId, setActiveRegionId] = useState('jember');
 
@@ -14,6 +18,11 @@ export default function App() {
     setActiveRegionId(regionId);
     setViewMode('emulator');
   };
+
+  // Selama perbaikan, hanya tampilkan notifikasi maintenance
+  if (isMaintenanceMode) {
+    return <MaintenanceNotice />;
+  }
 
   return (
     <div className="app-master-container">
